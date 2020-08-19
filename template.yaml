@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  finance_calculator
+  statistical_calculator
 
-  Sample SAM Template for finance_calculator
+  Sample SAM Template for statistical_calculator
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -11,42 +11,49 @@ Globals:
     Timeout: 3
 
 Resources:
-  FinancialCalculatorFunction:
+  StatisticalCalculatorFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello_world/
-      Handler: app.app
+      CodeUri: ./api
+      Handler: main.handler
       Runtime: python3.6
       Layers:
         - arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python36-SciPy1x:37
         - !Ref lib
       Events:
-        FinancialCalculator:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        ApiEvent:
           Properties:
-            Path: /ipmt
-            Method: get
+            RestApiId:
+              Ref: StatisticalCalculatorGateway
+            Path: /{proxy+}
+            Method: ANY
+          Type: Api
 
   lib:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: deps
-      Description: Dependencies for the financial calculator.
+      Description: Dependencies for the statistical calculator.
       ContentUri: deps/.
       CompatibleRuntimes:
         - python3.6
 
+  StatisticalCalculatorGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      OpenApiVersion: '3.0.0'
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  FinancialCalculatorApi:
-    Description: "API Gateway endpoint URL for Prod stage for Financial Calculator function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ipmt/"
-  FinancialCalculatorFunction:
-    Description: "Financial Calculator Lambda Function ARN"
-    Value: !GetAtt FinancialCalculatorFunction.Arn
-  FinancialCalculatorFunctionIamRole:
-    Description: "Implicit IAM Role created for Financial Calculator function"
-    Value: !GetAtt FinancialCalculatorFunctionRole.Arn
+  StatisticalCalculatorGateway:
+    Description: "API Gateway endpoint URL for Prod stage for Statistical Calculator function"
+    Value: !Sub "https://${StatisticalCalculatorGateway}.execute-api.${AWS::Region}.amazonaws.com/"
+  StatisticalCalculatorFunction:
+    Description: "Statistical Calculator Lambda Function ARN"
+    Value: !GetAtt StatisticalCalculatorFunction.Arn
+  StatisticalCalculatorFunctionIamRole:
+    Description: "Implicit IAM Role created for Statistical Calculator function"
+    Value: !GetAtt StatisticalCalculatorFunctionRole.Arn
