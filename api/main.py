@@ -4,7 +4,7 @@ from fastapi import FastAPI, Query
 from mangum import Mangum
 import scipy.stats as stats
 
-app = FastAPI(openapi_prefix="/prod")
+app = FastAPI(root_path="/prod")
 
 
 @app.get("/simple")
