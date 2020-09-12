@@ -7,6 +7,7 @@ import scipy.stats as stats
 app = FastAPI(root_path="/prod")
 
 
+
 @app.get("/simple")
 def read_root():
     return {"Hello": "World"}
@@ -17,15 +18,9 @@ def stats_describe(numbers: List[float] = Query(
     default=None,
     title='Numbers',
     description='A set of numbers you wish to calculate statistics from.')):
+
     description = stats.describe(numbers)
-    result = {
-        "nobs": description.nobs,
-        "mean": description.mean,
-        "minmax": [int(num) for num in description.minmax],
-        "skewness": description.skewness,
-        "variance": description.variance,
-        "kurtosis": description.kurtosis
-    }
+    result = description._asdict()
     return result
 
 
