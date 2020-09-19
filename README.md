@@ -64,7 +64,7 @@ Test a single function by invoking it directly with a test event. An event is a 
 Run functions locally and invoke them with the `sam local invoke` command.
 
 ```bash
-statistical_calculator$ sam local invoke HelloWorldFunction --event events/event.json
+statistical_calculator$ sam local invoke StatisticalCalculatorFunction --event events/event.json
 ```
 
 The SAM CLI can also emulate your application's API. Use the `sam local start-api` to run the API locally on port 3000.
@@ -78,11 +78,13 @@ The SAM CLI reads the application template to determine the API's routes and the
 
 ```yaml
       Events:
-        HelloWorld:
-          Type: Api
+        ApiEvent:
           Properties:
-            Path: /hello
-            Method: get
+            RestApiId:
+              Ref: StatisticalCalculatorGateway
+            Path: /{proxy+}
+            Method: ANY
+          Type: Api
 ```
 
 ## Add a resource to your application
